@@ -1,4 +1,5 @@
 # Scope
+
 The RDF/JS SHACL-UI Task Force is a focus group of the RDF/JS Community Group.
 
 The objective is to enhance the SHACL ontology to cater specifically to the UI use cases for application development and data exploration.
