@@ -6,6 +6,7 @@ The objective is to enhance the SHACL ontology to cater specifically to the UI u
 It covers reading and writing RDF data.
 Interfaces for reusable UI components should be established.
 To achieve this, we aim for implementations to rely solely on the SHACL ontology and the UI extension, enabling them to select UI components and generate layouts.
+The foundation for this will be the existing [DASH](https://datashapes.org/) ontology.
 The defined interfaces will enable seamless communication between implementations and UI components, enabling efficient reading and writing of RDF data.
 Whenever feasible, we will utilize other RDF/JS specifications.
 
