@@ -1,0 +1,566 @@
+# This is a subset of http://datashapes.org/dash with features relevant to the SHACL-UI effort
+
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix tosh: <http://topbraid.org/tosh#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://datashapes.org/dash>
+  a owl:Ontology ;
+  rdfs:label "DASH Data Shapes Vocabulary" ;
+  owl:imports sh: ;
+  sh:declare [
+      sh:namespace "http://datashapes.org/dash#"^^xsd:anyURI ;
+      sh:prefix "dash" ;
+    ] ;
+  sh:declare [
+      sh:namespace "http://purl.org/dc/terms/"^^xsd:anyURI ;
+      sh:prefix "dcterms" ;
+    ] ;
+  sh:declare [
+      sh:namespace "http://www.w3.org/1999/02/22-rdf-syntax-ns#"^^xsd:anyURI ;
+      sh:prefix "rdf" ;
+    ] ;
+  sh:declare [
+      sh:namespace "http://www.w3.org/2000/01/rdf-schema#"^^xsd:anyURI ;
+      sh:prefix "rdfs" ;
+    ] ;
+  sh:declare [
+      sh:namespace "http://www.w3.org/2001/XMLSchema#"^^xsd:anyURI ;
+      sh:prefix "xsd" ;
+    ] ;
+  sh:declare [
+      sh:namespace "http://www.w3.org/2002/07/owl#"^^xsd:anyURI ;
+      sh:prefix "owl" ;
+    ] ;
+  sh:declare [
+      sh:namespace "http://www.w3.org/2004/02/skos/core#"^^xsd:anyURI ;
+      sh:prefix "skos" ;
+    ] ;
+.
+dash:AutoCompleteEditor
+  a dash:SingleEditor ;
+  rdfs:comment "An auto-complete field to enter the label of instances of a class. This is the fallback editor for any URI resource if no other editors are more suitable." ;
+  rdfs:label "Auto-complete editor" ;
+.
+dash:BlankNodeViewer
+  a dash:SingleViewer ;
+  rdfs:comment "A Viewer for blank nodes, rendering as the label of the blank node." ;
+  rdfs:label "Blank node viewer" ;
+.
+dash:BooleanSelectEditor
+  a dash:SingleEditor ;
+  rdfs:comment """An editor for boolean literals, rendering as a select box with values true and false.
+
+Also displays the current value (such as "1"^^xsd:boolean), but only allows to switch to true or false.""" ;
+  rdfs:label "Boolean select editor" ;
+.
+dash:DateOrDateTime
+  a rdf:List ;
+  rdf:first [
+      sh:datatype xsd:date ;
+    ] ;
+  rdf:rest (
+      [
+        sh:datatype xsd:dateTime ;
+      ]
+    ) ;
+  rdfs:comment "An rdf:List that can be used in property constraints as value for sh:or to indicate that all values of a property must be either xsd:date or xsd:dateTime." ;
+  rdfs:label "Date or date time" ;
+.
+dash:DatePickerEditor
+  a dash:SingleEditor ;
+  rdfs:comment "An editor for xsd:date literals, offering a calendar-like date picker." ;
+  rdfs:label "Date picker editor" ;
+.
+dash:DateTimePickerEditor
+  a dash:SingleEditor ;
+  rdfs:comment "An editor for xsd:dateTime literals, offering a calendar-like date picker and a time selector." ;
+  rdfs:label "Date time picker editor" ;
+.
+dash:DepictionRole
+  a dash:PropertyRole ;
+  rdfs:comment "Depiction properties provide images representing the focus nodes. Typical examples may be a photo of an animal or the map of a country." ;
+  rdfs:label "Depiction" ;
+.
+dash:DescriptionRole
+  a dash:PropertyRole ;
+  rdfs:comment "Description properties should produce text literals that may be used as an introduction/summary of what a focus node does." ;
+  rdfs:label "Description" ;
+.
+dash:DetailsEditor
+  a dash:SingleEditor ;
+  rdfs:comment "An editor for blank nodes, displaying a nested form where the values of the linked resource can be edited directly on the \"parent\" form. Can be used if the property declares sh:nodeKind sh:BlankNode and also a sh:node constraint." ;
+  rdfs:label "Details editor" ;
+.
+dash:DetailsViewer
+  a dash:SingleViewer ;
+  rdfs:comment "A Viewer for resources that shows the details of the value using its default view shape as a nested form-like display." ;
+  rdfs:label "Details viewer" ;
+.
+dash:Editor
+  a dash:ShapeClass ;
+  dash:abstract true ;
+  rdfs:comment "The class of widgets for editing value nodes." ;
+  rdfs:label "Editor" ;
+  rdfs:subClassOf dash:Widget ;
+.
+dash:EnumSelectEditor
+  a dash:SingleEditor ;
+  rdfs:comment "A drop-down editor for enumerated values (typically based on sh:in lists)." ;
+  rdfs:label "Enum select editor" ;
+.
+dash:HTMLOrStringOrLangString
+  a rdf:List ;
+  rdf:first [
+      sh:datatype rdf:HTML ;
+    ] ;
+  rdf:rest (
+      [
+        sh:datatype xsd:string ;
+      ]
+      [
+        sh:datatype rdf:langString ;
+      ]
+    ) ;
+  rdfs:comment "An rdf:List that can be used in property constraints as value for sh:or to indicate that all values of a property must be either rdf:HTML, xsd:string or rdf:langString (in that order of preference)." ;
+  rdfs:label "HTML or string or langString" ;
+.
+dash:HTMLViewer
+  a dash:SingleViewer ;
+  rdfs:comment "A Viewer for HTML encoded text from rdf:HTML literals, rendering as parsed HTML DOM elements. Also displays the language if the HTML has a lang attribute on its root DOM element." ;
+  rdfs:label "HTML viewer" ;
+.
+dash:HyperlinkViewer
+  a dash:SingleViewer ;
+  rdfs:comment """A Viewer for literals, rendering as a hyperlink to a URL.
+
+For literals it assumes the lexical form is the URL.
+
+This is often used as default viewer for xsd:anyURI literals. Unsupported for blank nodes.""" ;
+  rdfs:label "Hyperlink viewer" ;
+.
+dash:IDRole
+  a dash:PropertyRole ;
+  rdfs:comment "ID properties are short strings or other literals that identify the focus node among siblings. Examples may include social security numbers." ;
+  rdfs:label "ID" ;
+.
+dash:IconRole
+  a dash:PropertyRole ;
+  rdfs:comment """Icon properties produce images that are typically small and almost square-shaped, and that may be displayed in the upper left corner of a focus node's display. Values should be xsd:string or xsd:anyURI literals or IRI nodes pointing at URLs. Those URLs should ideally be vector graphics such as .svg files.
+
+Instances of the same class often have the same icon, and this icon may be computed using a sh:values rule or as sh:defaultValue.
+
+If the value is a relative URL then those should be resolved against the server that delivered the surrounding page.""" ;
+  rdfs:label "Icon" ;
+.
+dash:ImageViewer
+  a dash:SingleViewer ;
+  rdfs:comment "A Viewer for URI values that are recognized as images by a browser, rendering as an image." ;
+  rdfs:label "Image viewer" ;
+.
+dash:IndexedConstraintComponent
+  a sh:ConstraintComponent ;
+  rdfs:comment "A constraint component that can be used to mark property shapes to be indexed, meaning that each of its value nodes must carry a dash:index from 0 to N." ;
+  rdfs:label "Indexed constraint component" ;
+  sh:parameter dash:IndexedConstraintComponent-indexed ;
+.
+dash:IndexedConstraintComponent-indexed
+  a sh:Parameter ;
+  sh:path dash:indexed ;
+  dash:reifiableBy dash:ConstraintReificationShape ;
+  sh:datatype xsd:boolean ;
+  sh:description "True to activate indexing for this property." ;
+  sh:maxCount 1 ;
+  sh:name "indexed" ;
+.
+dash:InlineViewer
+  a dash:MultiViewer ;
+  rdfs:comment "A multi-viewer that renders all values horizontally, in a more compact form that just a single value per row." ;
+  rdfs:label "Inline viewer" ;
+.
+dash:InstancesSelectEditor
+  a dash:SingleEditor ;
+  rdfs:comment "A drop-down editor for all instances of the target class (based on sh:class of the property)." ;
+  rdfs:label "Instances select editor" ;
+.
+dash:KeyInfoRole
+  a dash:PropertyRole ;
+  rdfs:comment "The Key info role may be assigned to properties that are likely of special interest to a reader, so that they should appear whenever a summary of a focus node is shown." ;
+  rdfs:label "Key info" ;
+.
+dash:LabelRole
+  a dash:PropertyRole ;
+  rdfs:comment "Properties with this role produce strings that may serve as display label for the focus nodes. Labels should be either plain string literals or strings with a language tag. The values should also be single-line." ;
+  rdfs:label "Label" ;
+.
+dash:LabelViewer
+  a dash:SingleViewer ;
+  rdfs:comment "A Viewer for URI resources, rendering as a hyperlink to that URI based on the display label of the resource. Also includes other ways of interacting with the URI such as opening a nested summary display." ;
+  rdfs:label "Label viewer" ;
+.
+dash:LangStringViewer
+  a dash:SingleViewer ;
+  rdfs:comment "A Viewer for literals with a language tag, rendering as the text plus a language indicator." ;
+  rdfs:label "LangString viewer" ;
+.
+dash:ListNodeShape
+  a sh:NodeShape ;
+  rdfs:comment "Defines constraints on what it means for a node to be a node within a well-formed RDF list. Note that this does not check whether the rdf:rest items are also well-formed lists as this would lead to unsupported recursion." ;
+  rdfs:label "List node shape" ;
+  sh:or (
+      [
+        sh:hasValue () ;
+        sh:property [
+            a sh:PropertyShape ;
+            sh:path rdf:first ;
+            sh:maxCount 0 ;
+          ] ;
+        sh:property [
+            a sh:PropertyShape ;
+            sh:path rdf:rest ;
+            sh:maxCount 0 ;
+          ] ;
+      ]
+      [
+        sh:not [
+            sh:hasValue () ;
+          ] ;
+        sh:property [
+            a sh:PropertyShape ;
+            sh:path rdf:first ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+          ] ;
+        sh:property [
+            a sh:PropertyShape ;
+            sh:path rdf:rest ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+          ] ;
+      ]
+    ) ;
+.
+dash:ListShape
+  a sh:NodeShape ;
+  rdfs:comment """Defines constraints on what it means for a node to be a well-formed RDF list.
+
+The focus node must either be rdf:nil or not recursive. Furthermore, this shape uses dash:ListNodeShape as a "helper" to walk through all members of the whole list (including itself).""" ;
+  rdfs:label "List shape" ;
+  sh:or (
+      [
+        sh:hasValue () ;
+      ]
+      [
+        sh:not [
+            sh:hasValue () ;
+          ] ;
+        sh:property [
+            a sh:PropertyShape ;
+            sh:path [
+                sh:oneOrMorePath rdf:rest ;
+              ] ;
+            dash:nonRecursive true ;
+          ] ;
+      ]
+    ) ;
+  sh:property [
+      a sh:PropertyShape ;
+      sh:path [
+          sh:zeroOrMorePath rdf:rest ;
+        ] ;
+      rdfs:comment "Each list member (including this node) must be have the shape dash:ListNodeShape." ;
+      sh:node dash:ListNodeShape ;
+    ] ;
+.
+dash:LiteralViewer
+  a dash:SingleViewer ;
+  rdfs:comment "A simple viewer for literals, rendering the lexical form of the value." ;
+  rdfs:label "Literal viewer" ;
+.
+dash:MultiEditor
+  a dash:ShapeClass ;
+  rdfs:comment "An editor for multiple/all value nodes at once." ;
+  rdfs:label "Multi editor" ;
+  rdfs:subClassOf dash:Editor ;
+.
+dash:MultiViewer
+  a dash:ShapeClass ;
+  rdfs:comment "A viewer for multiple/all values at once." ;
+  rdfs:label "Multi viewer" ;
+  rdfs:subClassOf dash:Viewer ;
+.
+dash:NoSuitableEditor
+  a dash:SingleEditor ;
+  rdfs:comment "An \"editor\" that simply informs the user that the values cannot be edited here, but for example through source code editing." ;
+  rdfs:label "No suitable editor" ;
+.
+dash:NodeExpressionViewer
+  a dash:SingleViewer ;
+  rdfs:comment "A viewer for SHACL Node Expressions."^^rdf:HTML ;
+  rdfs:label "Node expression viewer" ;
+.
+dash:PropertyAutoCompleteEditor
+  a dash:SingleEditor ;
+  rdfs:comment "An editor for properties that are either defined as instances of rdf:Property or used as IRI values of sh:path. The component uses auto-complete to find these properties by their rdfs:labels or sh:names." ;
+  rdfs:label "Property auto-complete editor" ;
+.
+dash:PropertyLabelViewer
+  a dash:SingleViewer ;
+  rdfs:comment "A viewer for properties that renders a hyperlink using the display label or sh:name, allowing users to either navigate to the rdf:Property resource or the property shape definition. Should be used in conjunction with PropertyAutoCompleteEditor." ;
+  rdfs:label "Property label viewer" ;
+.
+dash:PropertyRole
+  a rdfs:Class ;
+  a sh:NodeShape ;
+  rdfs:comment "The class of roles that a property (shape) may take for its focus nodes." ;
+  rdfs:label "Property role" ;
+  rdfs:subClassOf rdfs:Resource ;
+.
+dash:ReifiableByConstraintComponent
+  a sh:ConstraintComponent ;
+  rdfs:label "Reifiable-by constraint component" ;
+  sh:labelTemplate "Reifiable by {$reifiableBy}" ;
+  sh:parameter dash:ReifiableByConstraintComponent-reifiableBy ;
+  sh:parameter dash:ReifiableByConstraintComponent-reificationRequired ;
+.
+dash:ReifiableByConstraintComponent-reifiableBy
+  a sh:Parameter ;
+  sh:path dash:reifiableBy ;
+  sh:class sh:NodeShape ;
+  sh:description "Can be used to specify the node shape that may be applied to reified statements produced by a property shape. The property shape must have a URI resource as its sh:path. The values of this property must be node shapes. User interfaces can use this information to determine which properties to present to users when reified statements are explored or edited. Also, SHACL validators can use it to determine how to validate reified triples. Use dash:None to indicate that no reification should be permitted." ;
+  sh:maxCount 1 ;
+  sh:name "reifiable by" ;
+  sh:nodeKind sh:IRI ;
+  sh:order "0"^^xsd:decimal ;
+.
+dash:ReifiableByConstraintComponent-reificationRequired
+  a sh:Parameter ;
+  sh:path dash:reificationRequired ;
+  sh:datatype xsd:boolean ;
+  sh:description "If set to true then the value must have a reification object with at least one property." ;
+  sh:maxCount 1 ;
+  sh:optional true ;
+  sh:name "reification required" ;
+  sh:order "1"^^xsd:decimal ;
+.
+dash:RichTextEditor
+  a dash:SingleEditor ;
+  rdfs:comment "A rich text editor to enter the lexical value of a literal and a drop down to select language. The selected language is stored in the HTML lang attribute of the root node in the HTML DOM tree." ;
+  rdfs:label "Rich text editor" ;
+.
+dash:RootClassConstraintComponent
+  a sh:ConstraintComponent ;
+  rdfs:comment "A constraint component defining the parameter dash:rootClass, which restricts the values to be either the root class itself or one of its subclasses. This is typically used in conjunction with properties that have rdfs:Class as their type." ;
+  rdfs:label "Root class constraint component" ;
+  sh:labelTemplate "Root class {$rootClass}" ;
+  sh:message "Value must be subclass of {$rootClass}" ;
+  sh:parameter dash:RootClassConstraintComponent-rootClass ;
+  sh:validator dash:hasRootClass ;
+.
+dash:RootClassConstraintComponent-rootClass
+  a sh:Parameter ;
+  sh:path dash:rootClass ;
+  dash:reifiableBy dash:ConstraintReificationShape ;
+  sh:class rdfs:Class ;
+  sh:description "The root class." ;
+  sh:name "root class" ;
+  sh:nodeKind sh:IRI ;
+.
+dash:SingleEditor
+  a dash:ShapeClass ;
+  rdfs:comment "An editor for individual value nodes." ;
+  rdfs:label "Single editor" ;
+  rdfs:subClassOf dash:Editor ;
+.
+dash:SingleLineConstraintComponent
+  a sh:ConstraintComponent ;
+  rdfs:comment """A constraint component that can be used to declare that all values that are literals must have a lexical form that contains no line breaks ('\\n' or '\\r').
+
+User interfaces may use the dash:singleLine flag to prefer a text field over a (multi-line) text area.""" ;
+  rdfs:label "Single line constraint component" ;
+  sh:message "Must not contain line breaks." ;
+  sh:parameter dash:SingleLineConstraintComponent-singleLine ;
+  sh:validator [
+      a sh:SPARQLAskValidator ;
+      sh:ask """ASK {
+    FILTER (!$singleLine || !isLiteral($value) || (!contains(str($value), '\\n') && !contains(str($value), '\\r')))
+}""" ;
+      sh:prefixes <http://datashapes.org/dash> ;
+    ] ;
+.
+dash:SingleLineConstraintComponent-singleLine
+  a sh:Parameter ;
+  sh:path dash:singleLine ;
+  dash:reifiableBy dash:ConstraintReificationShape ;
+  sh:datatype xsd:boolean ;
+  sh:description "True to state that the lexical form of literal value nodes must not contain any line breaks. False to state that line breaks are explicitly permitted." ;
+  sh:maxCount 1 ;
+  sh:name "single line" ;
+.
+dash:SingleViewer
+  a dash:ShapeClass ;
+  rdfs:comment "A viewer for a single value." ;
+  rdfs:label "Single viewer" ;
+  rdfs:subClassOf dash:Viewer ;
+.
+dash:StringOrLangString
+  a rdf:List ;
+  rdf:first [
+      sh:datatype xsd:string ;
+    ] ;
+  rdf:rest (
+      [
+        sh:datatype rdf:langString ;
+      ]
+    ) ;
+  rdfs:comment "An rdf:List that can be used in property constraints as value for sh:or to indicate that all values of a property must be either xsd:string or rdf:langString." ;
+  rdfs:label "String or langString" ;
+.
+dash:StringOrLangStringOrHTML
+  a rdf:List ;
+  rdf:first [
+      sh:datatype xsd:string ;
+    ] ;
+  rdf:rest (
+      [
+        sh:datatype rdf:langString ;
+      ]
+      [
+        sh:datatype rdf:HTML ;
+      ]
+    ) ;
+  rdfs:comment "An rdf:List that can be used in property constraints as value for sh:or to indicate that all values of a property must be either xsd:string, rdf:langString or rdf:HTML (in that order of preference)." ;
+  rdfs:label "string or langString or HTML" ;
+.
+dash:SubClassEditor
+  a dash:SingleEditor ;
+  rdfs:comment "An editor for properties that declare a dash:rootClass. The editor allows selecting either the class itself or one of its subclasses." ;
+  rdfs:label "Sub-Class editor" ;
+.
+dash:TextAreaEditor
+  a dash:SingleEditor ;
+  rdfs:comment "A multi-line text area to enter the value of a literal." ;
+  rdfs:label "Text area editor" ;
+.
+dash:TextAreaWithLangEditor
+  a dash:SingleEditor ;
+  rdfs:comment "A multi-line text area to enter the value of a literal and a drop down to select a language." ;
+  rdfs:label "Text area with lang editor" ;
+.
+dash:TextFieldEditor
+  a dash:SingleEditor ;
+  rdfs:comment """A simple input field to enter the value of a literal, without the ability to change language or datatype.
+
+This is the fallback editor for any literal if no other editors are more suitable.""" ;
+  rdfs:label "Text field editor" ;
+.
+dash:TextFieldWithLangEditor
+  a dash:SingleEditor ;
+  rdfs:comment "A single-line input field to enter the value of a literal and a drop down to select language, which is mandatory unless xsd:string is among the permissible datatypes." ;
+  rdfs:label "Text field with lang editor" ;
+.
+dash:URIEditor
+  a dash:SingleEditor ;
+  rdfs:comment "An input field to enter the URI of a resource, e.g. rdfs:seeAlso links or images." ;
+  rdfs:label "URI editor" ;
+.
+dash:URIViewer
+  a dash:SingleViewer ;
+  rdfs:comment "A Viewer for URI resources, rendering as a hyperlink to that URI. Also includes other ways of interacting with the URI such as opening a nested summary display." ;
+  rdfs:label "URI viewer" ;
+.
+dash:UntrustedHTMLViewer
+  a dash:SingleViewer ;
+  rdfs:comment "A Viewer for HTML content from untrusted sources. This viewer will sanitize the HTML before rendering. Any a, button, checkbox, form, hidden, input, img, script, select, style and textarea tags and class and style attributes will be removed." ;
+  rdfs:label "Untrusted HTML viewer" ;
+.
+dash:ValueTableViewer
+  a dash:MultiViewer ;
+  rdfs:comment "A viewer that renders all values of a given property as a table, with one value per row, and the columns defined by the shape that is the sh:node or sh:class of the property." ;
+  rdfs:label "Value table viewer" ;
+.
+dash:Viewer
+  a dash:ShapeClass ;
+  dash:abstract true ;
+  rdfs:comment "The class of widgets for viewing value nodes." ;
+  rdfs:label "Viewer" ;
+  rdfs:subClassOf dash:Widget ;
+.
+dash:Widget
+  a dash:ShapeClass ;
+  dash:abstract true ;
+  rdfs:comment "Base class of user interface components that can be used to display or edit value nodes." ;
+  rdfs:label "Widget" ;
+  rdfs:subClassOf rdfs:Resource ;
+.
+dash:WikidataEntityEditor
+  a dash:SingleEditor ;
+  dash:hidden true ;
+  rdfs:comment "An auto-complete editor for properties that point at a Wikidata entity (typically with a sh:class constraint to a subclass of wikidash:Entity), using the public wikidata web service. It is unclear if this editor is needed in the future, because the generic auto-complete widget handled entities automatically, therefore it's marked hidden for now." ;
+  rdfs:label "Wikidata entity editor" ;
+.
+dash:abstract
+  a rdf:Property ;
+  rdfs:comment "Indicates that a class is \"abstract\" and cannot be used in asserted rdf:type triples. Only non-abstract subclasses of abstract classes should be instantiated directly." ;
+  rdfs:domain rdfs:Class ;
+  rdfs:label "abstract" ;
+  rdfs:range xsd:boolean ;
+.
+dash:applicableToClass
+  a rdf:Property ;
+  rdfs:comment "Can be used to state that a shape is applicable to instances of a given class. This is a softer statement than \"target class\": a target means that all instances of the class must conform to the shape. Being applicable to simply means that the shape may apply to (some) instances of the class. This information can be used by algorithms or humans." ;
+  rdfs:domain sh:Shape ;
+  rdfs:label "applicable to class" ;
+  rdfs:range rdfs:Class ;
+.
+dash:editor
+  a rdf:Property ;
+  rdfs:comment "Can be used to link a property shape with an editor, to state a preferred editing widget in user interfaces." ;
+  rdfs:domain sh:PropertyShape ;
+  rdfs:label "editor" ;
+  rdfs:range dash:Editor ;
+.
+dash:hidden
+  a rdf:Property ;
+  rdfs:comment "Properties marked as hidden do not appear in user interfaces, yet remain part of the shape for other purposes such as validation and scripting or GraphQL schema generation." ;
+  rdfs:domain sh:PropertyShape ;
+  rdfs:label "hidden" ;
+  rdfs:range xsd:boolean ;
+.
+dash:index
+  a rdf:Property ;
+  rdfs:label "index" ;
+  rdfs:range xsd:integer ;
+.
+dash:indexed
+  a rdf:Property ;
+  rdfs:domain sh:PropertyShape ;
+  rdfs:range xsd:boolean ;
+.
+dash:reifiableBy
+  a rdf:Property ;
+  rdfs:comment "Can be used to specify the node shape that may be applied to reified statements produced by a property shape. The property shape must have a URI resource as its sh:path. The values of this property must be node shapes. User interfaces can use this information to determine which properties to present to users when reified statements are explored or edited. Use dash:None to indicate that no reification should be permitted." ;
+  rdfs:domain sh:PropertyShape ;
+  rdfs:label "reifiable by" ;
+  rdfs:range sh:NodeShape ;
+.
+dash:singleLine
+  a rdf:Property ;
+  rdfs:label "single line" ;
+  rdfs:range xsd:boolean ;
+.
+dash:viewer
+  a rdf:Property ;
+  rdfs:comment "Can be used to link a property shape with a viewer, to state a preferred viewing widget in user interfaces." ;
+  rdfs:domain sh:PropertyShape ;
+  rdfs:label "viewer" ;
+  rdfs:range dash:Viewer ;
+.
+owl:Class
+  a rdfs:Class ;
+  rdfs:subClassOf rdfs:Class ;
+.
