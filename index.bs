@@ -1,0 +1,26 @@
+<pre class='metadata'>
+Title: RDF/JS: SHACL-UI specification
+Shortname: shacl-ui
+Level: 1
+Status: w3c/CG-DRAFT
+Group: RDF JavaScript Libraries Community Group
+Repository: rdfjs/shacl-ui
+URL: https://github.io/rdfjs/shacl-ui/
+Editor: Thomas Bergwinkl, https://www.bergnet.org/
+Abstract:
+  This specification introduces an ontology that extends SHACL to define shape-driven UI components and layouts.
+Complain About: accidental-2119 yes, missing-example-ids yes
+Markup Shorthands: markdown yes, css no
+</pre>
+
+# Introduction # {#intro}
+
+*This section is non-normative*
+
+The objective is to enhance the SHACL ontology to cater specifically to the UI use cases for application development and data exploration.
+It covers viewing, editing and filtering RDF data.
+Interfaces for reusable UI components should be established.
+To achieve this, we aim for implementations to rely on the SHACL ontology and the UI extension, enabling them to select UI components and generate layouts.
+The foundation for this will be the existing DASH ontology.
+The defined interfaces will enable seamless communication between implementations and UI components, enabling efficient viewing, editing or filtering of RDF data.
+Whenever feasible, we will utilize other RDF/JS specifications.
