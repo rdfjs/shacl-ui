@@ -1,0 +1,23 @@
+name: Build HTML and publish it to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+      - run: python3 -m pip install --upgrade pip
+      - run: python3 -m pip install --upgrade bikeshed && bikeshed update
+      - run: mkdir public
+      - run: bikeshed spec index.bs public/index.html
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
