@@ -1,0 +1,29 @@
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix sh: <http://www.w3.org/ns/shacl#>.
+@prefix shui: <https://rdf.js.org/shacl-ui#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+<https://rdf.js.org/shacl-ui> a owl:Ontology;
+  rdfs:label "SHACL-UI Vocabulary";
+  owl:imports sh:;
+  sh:declare [
+      sh:namespace "http://www.w3.org/2002/07/owl#"^^xsd:anyURI;
+      sh:prefix "owl"
+    ], [
+      sh:namespace "http://www.w3.org/1999/02/22-rdf-syntax-ns#"^^xsd:anyURI;
+      sh:prefix "rdf"
+    ], [
+      sh:namespace "http://www.w3.org/2000/01/rdf-schema#"^^xsd:anyURI;
+      sh:prefix "rdfs"
+    ], [
+      sh:namespace "http://www.w3.org/ns/shacl#"^^xsd:anyURI;
+      sh:prefix "sh"
+    ], [
+      sh:namespace "https://rdf.js.org/shacl-ui#"^^xsd:anyURI;
+      sh:prefix "shui"
+    ], [
+      sh:namespace "http://www.w3.org/2001/XMLSchema#"^^xsd:anyURI;
+      sh:prefix "xsd"
+    ].
