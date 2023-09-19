@@ -1,29 +1,247 @@
-@prefix owl: <http://www.w3.org/2002/07/owl#>.
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
-@prefix sh: <http://www.w3.org/ns/shacl#>.
-@prefix shui: <https://rdf.js.org/shacl-ui#>.
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+# baseURI: https://rdf.js.org/shacl-ui
 
-<https://rdf.js.org/shacl-ui> a owl:Ontology;
-  rdfs:label "SHACL-UI Vocabulary";
-  owl:imports sh:;
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix shui: <https://rdf.js.org/shacl-ui#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://rdf.js.org/shacl-ui>
+  a owl:Ontology ;
+  rdfs:label "SHACL-UI Vocabulary" ;
+  owl:imports sh: ;
   sh:declare [
-      sh:namespace "http://www.w3.org/2002/07/owl#"^^xsd:anyURI;
-      sh:prefix "owl"
-    ], [
-      sh:namespace "http://www.w3.org/1999/02/22-rdf-syntax-ns#"^^xsd:anyURI;
-      sh:prefix "rdf"
-    ], [
-      sh:namespace "http://www.w3.org/2000/01/rdf-schema#"^^xsd:anyURI;
-      sh:prefix "rdfs"
-    ], [
-      sh:namespace "http://www.w3.org/ns/shacl#"^^xsd:anyURI;
-      sh:prefix "sh"
-    ], [
-      sh:namespace "https://rdf.js.org/shacl-ui#"^^xsd:anyURI;
-      sh:prefix "shui"
-    ], [
-      sh:namespace "http://www.w3.org/2001/XMLSchema#"^^xsd:anyURI;
-      sh:prefix "xsd"
-    ].
+      sh:namespace "http://www.w3.org/1999/02/22-rdf-syntax-ns#"^^xsd:anyURI ;
+      sh:prefix "rdf" ;
+    ] ;
+  sh:declare [
+      sh:namespace "http://www.w3.org/2000/01/rdf-schema#"^^xsd:anyURI ;
+      sh:prefix "rdfs" ;
+    ] ;
+  sh:declare [
+      sh:namespace "http://www.w3.org/2001/XMLSchema#"^^xsd:anyURI ;
+      sh:prefix "xsd" ;
+    ] ;
+  sh:declare [
+      sh:namespace "http://www.w3.org/2002/07/owl#"^^xsd:anyURI ;
+      sh:prefix "owl" ;
+    ] ;
+  sh:declare [
+      sh:namespace "http://www.w3.org/ns/shacl#"^^xsd:anyURI ;
+      sh:prefix "sh" ;
+    ] ;
+  sh:declare [
+      sh:namespace "https://rdf.js.org/shacl-ui#"^^xsd:anyURI ;
+      sh:prefix "shui" ;
+    ] ;
+.
+shui:AutoCompleteEditor
+  a shui:SingleEditor ;
+  rdfs:comment "An auto-complete field to enter the label of instances of a class. This is the fallback editor for any URI resource if no other editors are more suitable." ;
+  rdfs:label "Auto-complete editor" ;
+.
+shui:BlankNodeViewer
+  a shui:SingleViewer ;
+  rdfs:comment "A Viewer for blank nodes, rendering as the label of the blank node." ;
+  rdfs:label "Blank node viewer" ;
+.
+shui:BooleanSelectEditor
+  a shui:SingleEditor ;
+  rdfs:comment """An editor for boolean literals, rendering as a select box with values true and false.
+
+Also displays the current value (such as "1"^^xsd:boolean), but only allows to switch to true or false.""" ;
+  rdfs:label "Boolean select editor" ;
+.
+shui:DatePickerEditor
+  a shui:SingleEditor ;
+  rdfs:comment "An editor for xsd:date literals, offering a calendar-like date picker." ;
+  rdfs:label "Date picker editor" ;
+.
+shui:DateTimePickerEditor
+  a shui:SingleEditor ;
+  rdfs:comment "An editor for xsd:dateTime literals, offering a calendar-like date picker and a time selector." ;
+  rdfs:label "Date time picker editor" ;
+.
+shui:DetailsEditor
+  a shui:SingleEditor ;
+  rdfs:comment "An editor for blank nodes, displaying a nested form where the values of the linked resource can be edited directly on the \"parent\" form. Can be used if the property declares sh:nodeKind sh:BlankNode and also a sh:node constraint." ;
+  rdfs:label "Details editor" ;
+.
+shui:DetailsViewer
+  a shui:SingleViewer ;
+  rdfs:comment "A Viewer for resources that shows the details of the value using its default view shape as a nested form-like display." ;
+  rdfs:label "Details viewer" ;
+.
+shui:Editor
+  a rdfs:Class ;
+  rdfs:comment "The class of widgets for editing value nodes." ;
+  rdfs:label "Editor" ;
+  rdfs:subClassOf shui:Widget ;
+.
+shui:EnumSelectEditor
+  a shui:SingleEditor ;
+  rdfs:comment "A drop-down editor for enumerated values (typically based on sh:in lists)." ;
+  rdfs:label "Enum select editor" ;
+.
+shui:HTMLViewer
+  a shui:SingleViewer ;
+  rdfs:comment "A Viewer for HTML encoded text from rdf:HTML literals, rendering as parsed HTML DOM elements. Also displays the language if the HTML has a lang attribute on its root DOM element." ;
+  rdfs:label "HTML viewer" ;
+.
+shui:HyperlinkViewer
+  a shui:SingleViewer ;
+  rdfs:comment """A Viewer for literals, rendering as a hyperlink to a URL.
+
+For literals it assumes the lexical form is the URL.
+
+This is often used as default viewer for xsd:anyURI literals. Unsupported for blank nodes.""" ;
+  rdfs:label "Hyperlink viewer" ;
+.
+shui:ImageViewer
+  a shui:SingleViewer ;
+  rdfs:comment "A Viewer for URI values that are recognized as images by a browser, rendering as an image." ;
+  rdfs:label "Image viewer" ;
+.
+shui:InlineViewer
+  a shui:MultiViewer ;
+  rdfs:comment "A multi-viewer that renders all values horizontally, in a more compact form that just a single value per row." ;
+  rdfs:label "Inline viewer" ;
+.
+shui:InstancesSelectEditor
+  a shui:SingleEditor ;
+  rdfs:comment "A drop-down editor for all instances of the target class (based on sh:class of the property)." ;
+  rdfs:label "Instances select editor" ;
+.
+shui:LabelViewer
+  a shui:SingleViewer ;
+  rdfs:comment "A Viewer for URI resources, rendering as a hyperlink to that URI based on the display label of the resource. Also includes other ways of interacting with the URI such as opening a nested summary display." ;
+  rdfs:label "Label viewer" ;
+.
+shui:LangStringViewer
+  a shui:SingleViewer ;
+  rdfs:comment "A Viewer for literals with a language tag, rendering as the text plus a language indicator." ;
+  rdfs:label "LangString viewer" ;
+.
+shui:LiteralViewer
+  a shui:SingleViewer ;
+  rdfs:comment "A simple viewer for literals, rendering the lexical form of the value." ;
+  rdfs:label "Literal viewer" ;
+.
+shui:MultiEditor
+  a rdfs:Class ;
+  rdfs:comment "An editor for multiple/all value nodes at once." ;
+  rdfs:label "Multi editor" ;
+  rdfs:subClassOf shui:Editor ;
+.
+shui:MultiViewer
+  a rdfs:Class ;
+  rdfs:comment "A viewer for multiple/all values at once." ;
+  rdfs:label "Multi viewer" ;
+  rdfs:subClassOf shui:Viewer ;
+.
+shui:NoSuitableEditor
+  a shui:SingleEditor ;
+  rdfs:comment "An \"editor\" that simply informs the user that the values cannot be edited here, but for example through source code editing." ;
+  rdfs:label "No suitable editor" ;
+.
+shui:NodeExpressionViewer
+  a shui:SingleViewer ;
+  rdfs:comment "A viewer for SHACL Node Expressions."^^rdf:HTML ;
+  rdfs:label "Node expression viewer" ;
+.
+shui:PropertyAutoCompleteEditor
+  a shui:SingleEditor ;
+  rdfs:comment "An editor for properties that are either defined as instances of rdf:Property or used as IRI values of sh:path. The component uses auto-complete to find these properties by their rdfs:labels or sh:names." ;
+  rdfs:label "Property auto-complete editor" ;
+.
+shui:PropertyLabelViewer
+  a shui:SingleViewer ;
+  rdfs:comment "A viewer for properties that renders a hyperlink using the display label or sh:name, allowing users to either navigate to the rdf:Property resource or the property shape definition. Should be used in conjunction with PropertyAutoCompleteEditor." ;
+  rdfs:label "Property label viewer" ;
+.
+shui:RichTextEditor
+  a shui:SingleEditor ;
+  rdfs:comment "A rich text editor to enter the lexical value of a literal and a drop down to select language. The selected language is stored in the HTML lang attribute of the root node in the HTML DOM tree." ;
+  rdfs:label "Rich text editor" ;
+.
+shui:SingleEditor
+  a rdfs:Class ;
+  rdfs:comment "An editor for individual value nodes." ;
+  rdfs:label "Single editor" ;
+  rdfs:subClassOf shui:Editor ;
+.
+shui:SingleViewer
+  a rdfs:Class ;
+  rdfs:comment "A viewer for a single value." ;
+  rdfs:label "Single viewer" ;
+  rdfs:subClassOf shui:Viewer ;
+.
+shui:SubClassEditor
+  a shui:SingleEditor ;
+  rdfs:comment "An editor for properties that declare a shui:rootClass. The editor allows selecting either the class itself or one of its subclasses." ;
+  rdfs:label "Sub-Class editor" ;
+.
+shui:TextAreaEditor
+  a shui:SingleEditor ;
+  rdfs:comment "A multi-line text area to enter the value of a literal." ;
+  rdfs:label "Text area editor" ;
+.
+shui:TextAreaWithLangEditor
+  a shui:SingleEditor ;
+  rdfs:comment "A multi-line text area to enter the value of a literal and a drop down to select a language." ;
+  rdfs:label "Text area with lang editor" ;
+.
+shui:TextFieldEditor
+  a shui:SingleEditor ;
+  rdfs:comment """A simple input field to enter the value of a literal, without the ability to change language or datatype.
+
+This is the fallback editor for any literal if no other editors are more suitable.""" ;
+  rdfs:label "Text field editor" ;
+.
+shui:TextFieldWithLangEditor
+  a shui:SingleEditor ;
+  rdfs:comment "A single-line input field to enter the value of a literal and a drop down to select language, which is mandatory unless xsd:string is among the permissible datatypes." ;
+  rdfs:label "Text field with lang editor" ;
+.
+shui:URIEditor
+  a shui:SingleEditor ;
+  rdfs:comment "An input field to enter the URI of a resource, e.g. rdfs:seeAlso links or images." ;
+  rdfs:label "URI editor" ;
+.
+shui:URIViewer
+  a shui:SingleViewer ;
+  rdfs:comment "A Viewer for URI resources, rendering as a hyperlink to that URI. Also includes other ways of interacting with the URI such as opening a nested summary display." ;
+  rdfs:label "URI viewer" ;
+.
+shui:ValueTableViewer
+  a shui:MultiViewer ;
+  rdfs:comment "A viewer that renders all values of a given property as a table, with one value per row, and the columns defined by the shape that is the sh:node or sh:class of the property." ;
+  rdfs:label "Value table viewer" ;
+.
+shui:Viewer
+  a rdfs:Class ;
+  rdfs:comment "The class of widgets for viewing value nodes." ;
+  rdfs:label "Viewer" ;
+  rdfs:subClassOf shui:Widget ;
+.
+shui:Widget
+  a rdfs:Class ;
+  rdfs:comment "Base class of user interface components that can be used to display or edit value nodes." ;
+  rdfs:label "Widget" ;
+  rdfs:subClassOf rdfs:Resource ;
+.
+shui:editor
+  a rdf:Property ;
+  rdfs:comment "Can be used to link a property shape with an editor, to state a preferred editing widget in user interfaces." ;
+  rdfs:domain sh:PropertyShape ;
+  rdfs:label "editor" ;
+  rdfs:range shui:Editor ;
+.
+shui:viewer
+  a rdf:Property ;
+  rdfs:comment "Can be used to link a property shape with a viewer, to state a preferred viewing widget in user interfaces." ;
+  rdfs:domain sh:PropertyShape ;
+  rdfs:label "viewer" ;
+  rdfs:range shui:Viewer ;
+.
