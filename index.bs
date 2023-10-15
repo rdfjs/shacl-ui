@@ -24,3 +24,422 @@ To achieve this, we aim for implementations to rely on the SHACL ontology and th
 The foundation for this will be the existing DASH ontology.
 The defined interfaces will enable seamless communication between implementations and UI components, enabling efficient viewing, editing or filtering of RDF data.
 Whenever feasible, we will utilize other RDF/JS specifications.
+
+# Ontology # {#ontology}
+
+The SHACL UI extension provides ways of showing widgets to display forms and views. This is done with `shui:editor` and `shui:viewer`. These are copied over from the [DASH ontology](https://datashapes.org/forms.html#widgets). The SHACL UI extension provides a list of commonly used Editors and Viewers.
+
+If `shui:editor` and `shui:viewer` are not available in a SHACL property, it is common for the application to determine an appropiate Editor or Viewer. To support selection of the most suitable widget for a given value and property path, each widget comes with a score:
+
+*   0: the widget is not applicable at all
+*   between 1 and 100, the higher the better
+*   `null` if the widget may or may not be suitable, yet can be selected manually
+
+Such scores may produce multiple suitable widgets. For example, a property may either allow `xsd:date` or `xsd:dateTime` values. In such cases, the user interface should provide means to select one out of the suitable widgets.
+
+## Editors ## {#editors}
+
+The following sub-sections enumerate the currently defined instances of `shui:Editor` from the SHACL UI extension.
+
+### shui:AutoCompleteEditor ### {#AutoCompleteEditor}
+
+**Score:** 1 if the value is an IRI. 0 otherwise
+
+**Rendering:** an auto-complete field to enter the label of instances of the class specified for the property. For example if the `sh:class` of the property is `ex:Country` and the user starts typing "Nig" then "Niger" and "Nigeria" would show up as possible choices.
+
+<img src="images/editors/AutoCompleteEditor.png">
+
+```turtle
+ex:Person-bornIn
+  a sh:PropertyShape ;
+  sh:path ex:bornIn ;
+  sh:class ex:Country ;
+  ...
+```
+
+Implementations may also want to support the combination of `sh:class` with additional `sh:node` constraints to further narrow down the set of valid values. In this case the component would filter out any instances of the class that do not conform to the specified node shape. In the following example, the auto-complete would only show countries that are have `true` as their value for `ex:sovereign`.
+
+```turtle
+ex:Person-bornIn
+  a sh:PropertyShape ;
+  sh:path ex:bornIn ;
+  sh:class ex:Country ;
+  sh:node [
+    sh:property [
+      sh:path ex:sovereign ;
+      sh:hasValue true ;
+    ]
+  ] ; 
+  ...
+```
+
+### shui:BlankNodeEditor ### {#BlankNodeEditor}
+
+**Score:** 1 for blank nodes. 0 otherwise.
+
+**Rendering:** a read-only editor that displays the blank node similar to [shui:BlankNodeViewer](#BlankNodeViewer) yet allows the surrounding user interface to at least provide a delete button.
+
+### shui:BooleanSelectEditor ### {#BooleanSelectEditor}
+
+**Score:** 10 for `xsd:boolean` literals. 0 for non-literals or if there is a `sh:datatype` constraint. `null` for properties allowing literals without specifying a particular datatype.
+
+**Rendering:** a select box with values `true` and `false`. Also displays the current value (such as `"1"^^xsd:boolean`), but only allows to switch to true or false.
+
+<img src="images/editors/BooleanSelectEditor.png">
+
+```turtle
+ex:Person-married
+  a sh:PropertyShape ;
+  sh:path ex:married ;
+  sh:datatype xsd:boolean ;
+  ...
+```
+
+### shui:DatePickerEditor ### {#DatePickerEditor}
+
+**Score:** 10 for `xsd:date` literals. 5 if the property has `sh:datatype xsd:date`. 0 otherwise.
+
+**Rendering:** a calendar-like date picker.
+
+<img src="images/editors/DatePickerEditor.png">
+
+```turtle
+ex:Person-dateOfBirth
+  a sh:PropertyShape ;
+  sh:path ex:dateOfBirth ;
+  sh:datatype xsd:date ;
+  ...
+```
+
+### shui:DateTimePickerEditor ### {#DateTimePickerEditor}
+
+**Score:** 10 for `xsd:dateTime` literals. 5 if the property has `sh:datatype xsd:dateTime`. 0 otherwise.
+
+**Rendering:** a calendar-like date picker including a time selector.
+
+<img src="images/editors/DateTimePickerEditor.png">
+
+```turtle
+ex:Customer-lastVisitTime
+  a sh:PropertyShape ;
+  sh:path ex:lastVisitTime ;
+  sh:datatype xsd:dateTime ;
+  ...
+```
+### shui:DetailsEditor ### {#DetailsEditor}
+
+**Score:** `null` for non-literals, i.e. it can be selected manually via `shui:editor`. 0 otherwise.
+
+**Rendering:** typically rendering as a nested form, using the properties defined by the `sh:node` or `sh:class` (in that order) of the property as fields. Alternative renderings are possible, such as opening the resource in a separate dialog.
+
+This is particularly useful for some types of blank nodes that only make sense to be edited in the context of their parent resource.
+
+<img src="images/editors/DetailsEditor.png">
+
+```turtle
+ex:Product
+  a owl:Class ;
+  a sh:NodeShape ;
+  rdfs:label "Product" ;
+  rdfs:subClassOf owl:Thing ;
+  sh:property ex:Product-weight .
+
+ex:Product-weight
+  a sh:PropertyShape ;
+  sh:path ex:weight ;
+  shui:editor shui:DetailsEditor ;
+  shui:viewer shui:DetailsViewer ;
+  sh:description "A blank node with a numeric field and a unit which is one of the QUDT mass units." ;
+  sh:maxCount 1 ;
+  sh:name "weight" ;
+  sh:node ex:ValueWithWeight ;
+  sh:nodeKind sh:BlankNode .
+
+ex:ValueWithWeight
+  a sh:NodeShape ;
+  rdfs:label "Value with weight" ;
+  sh:property ex:ValueWithWeight-numericValue ;
+  sh:property ex:ValueWithWeight-unit .
+
+ex:ValueWithWeight-numericValue
+  a sh:PropertyShape ;
+  sh:path ex:numericValue ;
+  sh:datatype xsd:decimal ;
+  sh:maxCount 1 ;
+  sh:minCount 1 ;
+  sh:name "numeric value" .
+
+ex:ValueWithWeight-unit
+  a sh:PropertyShape ;
+  sh:path ex:unit ;
+  sh:class <http://qudt.org/schema/qudt/Unit> ;
+  sh:maxCount 1 ;
+  sh:minCount 1 ;
+  sh:name "unit" ;
+  sh:node [
+    rdfs:label "Permissible values must have quantity kind Mass." ;
+    sh:property [
+      sh:path <http://qudt.org/schema/qudt/hasQuantityKind> ;
+      sh:hasValue <http://qudt.org/vocab/quantitykind/Mass> ;
+    ] ;
+  ] .
+```
+
+### shui:EnumSelectEditor ### {#EnumSelectEditor}
+
+**Score:** 10 if there exists a `sh:in` constraint for the same property at the current focus node. 0 otherwise.
+
+**Rendering:** a drop-down editor for enum fields (based on the `sh:in` list, in that order).
+
+<img src="images/editors/EnumSelectEditor.png">
+
+```turtle
+ex:AustralianAddressShape-addressRegion
+  a sh:PropertyShape ;
+  sh:path schema:addressRegion ;
+  sh:in ( "ACT" "NSW" "NT" "QLD" "SA" "TAS" "VIC" "WA" ) ;
+  ...
+```
+
+### shui:InstancesSelectEditor ### {#InstancesSelectEditor}
+
+**Score:** `null` if there exists a `sh:class` for the property. 0 otherwise.
+
+**Rendering:** a drop-down editor for all instances of the target class (based on `sh:class` of the property). Typically only used for classes that have few instances.
+
+ex:Person-homeCountry
+  a sh:PropertyShape ;
+  sh:path ex:homeCountry ;
+  sh:class ex:Country ;
+  shui:editor shui:InstancesSelectEditor ;
+  ...
+
+### shui:RichTextEditor ### {#RichTextEditor}
+
+**Score:** 10 for `rdf:HTML` literals. 0 otherwise.
+
+**Rendering:** a rich text editor to enter the lexical value of a literal and a drop down to select language. The selected language is stored in the HTML `lang` attribute of the root node in the HTML DOM tree.
+
+<img src="images/editors/RichTextEditor.png">
+
+ex:Concept-definition
+  a sh:PropertyShape ;
+  sh:path skos:definition ;
+  sh:datatype rdf:HTML ;
+  ...
+
+### shui:SubClassEditor ### {#SubClassEditor}
+
+**Score:** `null` i.e. this should be selected explicitly through a `shui:editor` statement. However, this widget is typically only used if the property has a [`shui:rootClass`](http://datashapes.org/constraints.html#RootClassConstraintComponent) constraint, or (at minimum) only allows classes as values.
+
+**Rendering:** This may be an auto-complete widget to select a class or a class hierarchy widget, or a combination thereof. The permissible values are a given class or its subclasses, defaulting to `rdfs:Resource`. This is typically used with `shui:rootClass` to allow the user to select a subclass of the given root class.
+
+```turtle
+ex:Drug-impactedCell
+  a sh:PropertyShape ;
+  sh:path ex:impactedCell ;
+  shui:rootClass obo:CL\_0000000 ;
+  shui:editor shui:SubClassEditor ;
+  ...
+```
+
+### shui:TextAreaEditor ### {#TextAreaEditor}
+
+**Score:** 0 if the property is marked `shui:singleLine true`. 20 if the value is an `xsd:string` literal and `shui:singleLine false`. 5 if the value is an `xsd:string` literal. 2 if the property has `xsd:string` among the permissible datatypes. `null` if the property has a custom datatype (not from xsd or rdf namespaces but for example `geo:wktLiteral`). 0 otherwise.
+
+**Rendering:** a multi-line text area to enter the value of a literal.
+
+<img src="images/editors/TextAreaEditor.png">
+
+```turtle
+ex:Country-description
+  a sh:PropertyShape ;
+  sh:path ex:description ;
+  sh:datatype xsd:string ;
+  shui:singleLine false ;
+  ...
+```
+
+### shui:TextAreaWithLangEditor ### {#TextAreaWithLangEditor}
+
+**Score:** 0 if the property is marked `shui:singleLine true`. 15 if the value is an `rdf:langString` literal and `shui:singleLine false`. 5 if the value is an `rdf:langString` literal or the property permits such values. 0 otherwise.
+
+**Rendering:** a multi-line text area to enter the value of a literal and a drop down to select a language.
+
+<img src="images/editors/TextAreaWithLangEditor.png">
+
+```turtle
+ex:Country-description
+  a sh:PropertyShape ;
+  sh:path ex:description ;
+  sh:datatype rdf:langString ;
+  shui:singleLine false ;
+  ...
+```
+### shui:TextFieldEditor ### {#TextFieldEditor}
+
+**Score:** 10 if the value is a literal that is neither `rdf:langString` nor `xsd:boolean`. 0 otherwise.
+
+**Rendering:** an input field to enter the value of a literal, without the ability to change language or datatype.
+
+<img src="images/editors/TextFieldEditor.png">
+
+```turtle
+ex:Country-code
+  a sh:PropertyShape ;
+  sh:path ex:code ;
+  sh:datatype xsd:string ;
+  ...
+```
+
+### shui:TextFieldWithLangEditor ### {#TextFieldWithLangEditor}
+
+**Score:** 11 if the value is an `rdf:langString` literal or the property permits either (both) `rdf:langString` or `xsd:string`. 5 if the property is not `shui:singleLine false` and permits `rdf:langString` values. 0 otherwise.
+
+**Rendering:** a single-line input field to enter the value of a literal and a drop down to select language, which is mandatory unless `xsd:string` is among the permissible datatypes.
+
+<img src="images/editors/TextFieldWithLangEditor.png">
+
+```turtle
+ex:Concept-prefLabel
+  a sh:PropertyShape ;
+  sh:path skos:prefLabel ;
+  sh:datatype rdf:langString ;
+  ...
+```
+
+### shui:URIEditor ### {#URIEditor}
+
+**Score:** 10 if the value is a IRI node and the property has `sh:nodeKind sh:IRI` and no `sh:class` constraint. null if the value is a IRI node. 0 otherwise.
+
+**Rendering:** an input field to enter the URI of a resource, e.g. as value of `rdfs:seeAlso` or to enter the URL of an image on the web.
+
+<img src="images/editors/URIEditor.png">
+
+```turtle
+ex:Thing-seeAlso
+  a sh:PropertyShape ;
+  sh:path rdfs:seeAlso ;
+  sh:nodeKind sh:IRI ;
+  shui:editor shui:URIEditor ;
+  ...
+```
+
+## Viewers ## {#viewers}
+
+The following sub-sections enumerate the currently defined instances of `shui:Viewer` from the SHACL UI extension. Property shapes can explicitly specify the preferred viewer for its values using `shui:viewer`. If no such value has been specified, the system should pick a suitable default viewer based on the scoring system outlined for each widget.
+
+Most viewers render a single RDF value, typically as a single widget, on the screen. Form editors can offer buttons to edit individual values and add or delete values. However, some viewers need to take more complete control over how multiple values of a property at a focus node are rendered. The only example of such viewer in DASH is [`shui:ValueTableViewer`](#ValueTableViewer), which displays all values of a property as a HTML table. In those cases, the notions of generic add and delete buttons do not apply. Such viewers are called _Multi Viewers_ and are declared instance of `shui:MultiViewer` instead of `shui:SingleViewer`. The equivalent classes for editors are `shui:MultiEditor` and `shui:SingleEditor`.
+
+### shui:BlankNodeViewer ### {#BlankNodeViewer}
+
+**Score:** 1 for blank nodes. 0 for all other nodes.
+
+**Rendering:** a human-readable label of the blank node. For example, if the blank node is an OWL restriction, then Manchester Syntax could be used. If the blank node is a SPIN RDF expression, then a SPARQL string could be produced. This rendering may include hyperlinks to other resources that can be reached from the blank node.
+
+### shui:DetailsViewer ### {#DetailsViewer}
+
+**Score:** 0 for literals. `null` for IRIs and blank nodes.
+
+**Rendering:** shows the details of the value using its default view shape or the shape specified using `sh:node`, as a nested form-like display.
+
+### shui:HTMLViewer ### {#HTMLViewer}
+
+**Score:** 50 for literals with datatype `rdf:HTML`. 0 for all other values.
+
+**Rendering:** the literal parsed into HTML DOM elements. Hyperlinks in the HTML may get redirected to select resources within the same application. Also displays the language if the HTML has a `lang` attribute on its root DOM element.
+
+### shui:HyperlinkViewer ### {#HyperlinkViewer}
+
+**Score:** 50 for literals with datatype `xsd:anyURI`. `null` for `xsd:string` literals. 0 for all other values.
+
+**Rendering:** a clickable hyperlink to the specified URI/URL.
+
+### shui:ImageViewer ### {#ImageViewer}
+
+**Score:** 50 for IRI nodes or literals that have a case-insensitive recognized image ending such as `.png`, `.jpg`, `.jpeg`, `.gif` and `.svg`.
+
+**Rendering:** the image at the given URL, using `<img>` in HTML.
+
+### shui:LabelViewer ### {#LabelViewer}
+
+**Score:** 5 if the value is a IRI. 0 otherwise.
+
+**Rendering:** as a hyperlink to that URI based on the display label of the resource. The display label is typically based on the must suitable `rdfs:label` or `skos:prefLabel` for the current user, based on her language preferences. Also includes other ways of interacting with the URI such as opening a nested summary display.
+
+### shui:LangStringViewer ### {#LangStringViewer}
+
+**Score:** 10 if the value is a literal of type `rdf:langString`. 0 otherwise.
+
+**Rendering:** as the text plus a language indicator (flag or language tag).
+
+### shui:LiteralViewer ### {#LiteralViewer}
+
+**Score:** 1 if the value is a literal. 0 otherwise.
+
+**Rendering:** the lexical form of the value.
+
+### shui:URIViewer ### {#URIViewer}
+
+**Score:** 1 if the value is a IRI. 0 otherwise.
+
+**Rendering:** as a hyperlink to that URI. Also includes other ways of interacting with the URI such as opening a nested summary display.
+
+### shui:ValueTableViewer ### {#ValueTableViewer}
+
+This is a Multi Viewer.
+
+**Score:** `null`
+
+**Rendering:** all values of the property at the focus node are rendered into a single (HTML) table that can be scrolled and paged independently from the rest of the form. Each value becomes one row. The columns of the table are derived from the node shape specified using `sh:node` for the property, in the order specified using `sh:order`.
+
+<img src="images/viewers/ValueTableViewer.png">
+
+In this example we have used a `sh:values` rule to infer the values of the first column. In this case, the values are simply pointing back to the focus node of each row, using `sh:this`. Note that `shui:applicableToClass` or `sh:targetClass` are needed to get this inference correctly.
+
+```turtle
+skos:Concept
+    sh:property ex:Concept-broader-inverse .
+
+ex:Concept-broader-inverse
+    a sh:PropertyShape ;
+    sh:path \[ sh:inversePath skos:broader \] ;
+    sh:group skos:HierarchicalRelationships ;
+    sh:name "narrower (table)" ;
+    shui:viewer shui:ValueTableViewer ;
+    sh:node ex:ConceptTableShape .
+
+ex:ConceptTableShape
+    a sh:NodeShape ;
+    shui:applicableToClass skos:Concept ;
+    rdfs:comment "A node shape defining the columns for a shui:ValueTableViewer." ;
+    rdfs:label "Concept table shape" ;
+    sh:property ex:ConceptTableShape-self ;
+    sh:property ex:ConceptTableShape-type ;
+    sh:property ex:ConceptTableShape-altLabel .
+
+ex:ConceptTableShape-self
+    a sh:PropertyShape ;
+    sh:path ex:self ;
+    sh:description "This column is used to render the (narrower) concept itself." ;
+    sh:name "narrower concept" ;
+    sh:nodeKind sh:IRI ;
+    sh:order "0"^^xsd:decimal ;
+    sh:values sh:this .
+
+ex:ConceptTableShape-type
+    a sh:PropertyShape ;
+    sh:path rdf:type ;
+    sh:description "The second column shows the type of each value." ;
+    sh:name "type" ;
+    sh:nodeKind sh:IRI ;
+    sh:order "1"^^xsd:decimal .
+
+ex:ConceptTableShape-altLabel
+    a sh:PropertyShape ;
+    sh:path skos:altLabel ;
+    sh:description "The third column shows the alternative labels." ;
+    sh:name "alt labels" ;
+    sh:or shui:StringOrLangString ;
+    sh:order "2"^^xsd:decimal .
+```
