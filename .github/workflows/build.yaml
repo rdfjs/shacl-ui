@@ -17,6 +17,7 @@ jobs:
       - run: python3 -m pip install --upgrade bikeshed && bikeshed update
       - run: mkdir public
       - run: bikeshed spec index.bs public/index.html
+      - run: cp images public/images
       - uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
